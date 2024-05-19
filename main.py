@@ -2,7 +2,10 @@ from typing import Optional
 from dotenv import load_dotenv
 import json, yandexapi, os, telebot
 from telebot import types as tgtypes
+from touch_db import Touch
 
+load_dotenv()
+db = Touch() # оно на будущее оставлено
 bot = telebot.TeleBot(os.environ.get('TOKEN'))
 
 def send_message(message: tgtypes.Message, text: str, keyboard: Optional[telebot.REPLY_MARKUP_TYPES]=None, edit_message=False) -> tgtypes.Message:
