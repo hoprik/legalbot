@@ -48,6 +48,18 @@ def tokens_handler(message):
 
 Кол-во оставшихся токенов: {tokens}""")
 
+@bot.message_handler(commands=['history'])
+def history(message):
+    try:
+        history = dbh.get_history(message.chat.id, 10)
+        if not history:
+            history_message = "Нету истории"
+        else:
+            history_message = "\n".join([f"{row[0]}: {row[1]} (время: {row[2]})" for row in history])
+        bot.send_message(message.chat.id, f"Вот ваша история:\n{history_message}")
+    except Exception as e:
+        bot.send_message(message.chat.id, f"Произошла ошибка при получении истории: {e}")
+
 @bot.message_handler(content_types=['text'])
 def text_reply(message):
     chat_id = message.chat.id
@@ -57,7 +69,7 @@ def text_reply(message):
                          "Ваши токены закончились, функция общения с нейросетью невозможна")
     else:
         text = message.text  # Получаем текст сообщения от пользователя
-        user_history = dbh.get_history(message.chat.id)
+        user_history = dbh.get_history(message.chat.id, 3)
         history_text = "\n".join([f"{row[0]}: {row[1]} ({row[2]})" for row in user_history])
         logging.info(f"История общения: {history_text}")
         final_text = f"{text}, История чата: {history_text}"

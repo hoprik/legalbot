@@ -39,15 +39,19 @@ class History:
             cur.execute(sql, (role, message, datetime.datetime.now().isoformat()))
             self.conn.commit()
 
-    def get_history(self, user_id):
+    def get_history(self, user_id, limit):
         table_name = f"history_{user_id}"
-        sql = f''' SELECT role, message, timestamp FROM {table_name} ORDER BY timestamp DESC LIMIT 3'''
-        cur = self.conn.cursor()
-        cur.execute(sql)
-        rows = cur.fetchall()
-        if not rows:
-            return ["Нету истории"]
-        return rows
+        sql = f'''SELECT role, message, timestamp FROM {table_name} ORDER BY timestamp DESC LIMIT {limit}'''
+        try:
+            cur = self.conn.cursor()
+            cur.execute(sql)
+            rows = cur.fetchall()
+            if not rows:
+                return []
+            return rows
+        except Exception as e:
+            print(f"Ошибка при получении истории для пользователя {user_id}: {e}")
+            return []
 
     def clear_history(self, user_id):
         table_name = f"history_{user_id}"
